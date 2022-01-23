@@ -9,7 +9,7 @@ table {
 td {
   border: 1px solid black;
   text-align: left;
-  padding: 11px;
+  padding: 8px;
   width: 5%;
   text-align: center;
 }
@@ -24,7 +24,7 @@ th {
 }
 
 tr:nth-child(even) {
-  background-color: #add8e6;
+  background-color: #87cefa ;
   text-align: center;
 }
 tr:nth-child(odd) {
@@ -86,7 +86,7 @@ input[type = submit]:hover {
   text-align:center;
 } 
 body{
-  background: url("https://c4.wallpaperflare.com/wallpaper/614/675/661/beautiful-pictures-nature-waterfall-wallpaper-preview.jpg") no-repeat center center fixed; 
+  background: url("https://images.unsplash.com/photo-1508971607899-a238a095d417?ixid=MnwxMjA3fDB8MHxwaG90by1wYWdlfHx8fGVufDB8fHx8&ixlib=rb-1.2.1&auto=format&fit=crop&w=774&q=80") no-repeat center center fixed; 
   -webkit-background-size: cover;
   -moz-background-size: cover;
   -o-background-size: cover;

@@ -4,8 +4,9 @@ import mysql.connector
 import html
 import collections
 import logging
-import logging
 from threading import Thread
+import time
+import concurrent.futures
 from datetime import datetime
 
 data = [0 for i in range(150)]
@@ -16,7 +17,7 @@ mydb = mysql.connector.connect(
     host="localhost",
     user="root",
     password="",
-    database="iris"
+    database="mds_sort"
 )
 
 
@@ -26,7 +27,7 @@ def database():
         host="localhost",
         user="root",
         password="",
-        database="iris"
+        database="mds_sort"
     )
     mydb2 = mysql.connector.connect(
         host="localhost",
@@ -37,7 +38,7 @@ def database():
     mycursor2.execute("DROP DATABASE IF EXISTS temp1")
     mycursor2.execute("CREATE DATABASE temp1")
     mycursor = mydb.cursor()
-    tables_names = "SELECT TABLE_NAME FROM INFORMATION_SCHEMA.TABLES WHERE TABLE_TYPE='BASE TABLE' AND TABLE_SCHEMA='iris'"
+    tables_names = "SELECT TABLE_NAME FROM INFORMATION_SCHEMA.TABLES WHERE TABLE_TYPE='BASE TABLE' AND TABLE_SCHEMA='mds_sort'"
     mycursor.execute(tables_names)
     tables = mycursor.fetchall()
     myresult = []
@@ -67,10 +68,10 @@ def partition():
         host="localhost",
         user="root",
         password="",
-        database="iris"
+        database="mds_sort"
     )
     mycursor = mydb.cursor()
-    tables_names = "SELECT TABLE_NAME FROM INFORMATION_SCHEMA.TABLES WHERE TABLE_TYPE='BASE TABLE' AND TABLE_SCHEMA='iris'"
+    tables_names = "SELECT TABLE_NAME FROM INFORMATION_SCHEMA.TABLES WHERE TABLE_TYPE='BASE TABLE' AND TABLE_SCHEMA='mds_sort'"
     mycursor.execute(tables_names)
     tables = mycursor.fetchall()
     myresult = []
@@ -84,20 +85,27 @@ def partition():
         mycursor.execute(names)
         columns.append(mycursor.fetchall())
     total = len(myresult[0])
-    z = 3
+    range1=20
+    z=total//range1
+    if(total>range1*z):
+        z=z+1
     for j in range(z):
         mycursor1.execute("DROP TABLE IF EXISTS partition_"+str(j+1))
         s = ""
         for i in columns[0]:
             s = s+"`"+i[0]+"`"+" "+"VARCHAR (50),"
         mycursor1.execute("Create table partition_"+str(j+1)+" ("+s[:-1]+");")
-    for i in range(1, total+1):
-        if((i % 5)% z == 0):
-            mycursor1.execute("INSERT INTO `partition_"+str(z) +
-                              "` VALUES ('"+str("','".join(myresult[0][i-1]))+"')")
-            continue
-        mycursor1.execute("INSERT INTO `partition_"+str(((i % 5) % z)) +
-                          "` VALUES ('"+str("','".join(myresult[0][i-1]))+"')")
+    c=1
+    for i in range(1,total+1):
+        # mycursor1.execute("INSERT INTO `partition_"+str(c) +"` VALUES ('"+str("','".join(myresult[0][i-1]))+"')")
+        temp_id=int(myresult[0][i-1][0])
+        c=temp_id//range1
+        # print(c+1,temp_id)
+        # print(temp_id)
+        if(temp_id%range1==0):
+            mycursor1.execute("INSERT INTO `partition_"+str(c) +"` VALUES ('"+str("','".join(myresult[0][i-1]))+"')")
+        else:
+             mycursor1.execute("INSERT INTO `partition_"+str(c+1) +"` VALUES ('"+str("','".join(myresult[0][i-1]))+"')")
     mydb1.commit()
     tables_names1 = "SELECT TABLE_NAME FROM INFORMATION_SCHEMA.TABLES WHERE TABLE_TYPE='BASE TABLE' AND TABLE_SCHEMA='temp1'"
     mycursor1.execute(tables_names1)
@@ -108,8 +116,8 @@ def partition():
         names1 = "SELECT * FROM "+i[0]
         mycursor1.execute(names1)
         myresult1.append(mycursor1.fetchall())
-        names1 = "SELECT distinct Column_name FROM INFORMATION_SCHEMA.COLUMNS WHERE TABLE_NAME= '" + \
-            i[0]+"' ORDER BY ORDINAL_POSITION"
+        names1 = "SELECT Distinct Column_name FROM INFORMATION_SCHEMA.COLUMNS WHERE TABLE_NAME= '" + \
+            i[0]+"'"
         mycursor1.execute(names1)
         columns1.append(mycursor1.fetchall())
     return render_template('index.html', table=[], column=[], data=[], n=0, table1=tables1, column1=columns1, data1=myresult1, n1=len(tables1),f=0,cols=[],data2=[],method="")
@@ -250,3 +258,4 @@ def all_scan_search():
 
 if __name__ == '__main__':
     app.run(debug=True)
+
