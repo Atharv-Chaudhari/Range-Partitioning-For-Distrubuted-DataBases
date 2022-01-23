@@ -8,15 +8,15 @@
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <link rel="stylesheet" href="{{ url_for('static', filename='style.css') }}">
     <link rel="icon" href="static/db_round_robin.svg">
-    <title>Range partitioning</title>
+    <title>Hash partitioning</title>
 </head>
 
 <body>
     <div class="half-1">
         {% if n!=0 %}
-        <h1 style="text-align: center;color:red;">Current Database Structure</h1>
+        <h1 style="text-align: center;color:#0000CD;">Current Database Structure</h1>
         <div class="part">
-            <a href="/partition"><input type="submit" value="Range Partitions"></a>
+            <a href="/partition"><input type="submit" value="Hash Partitions"></a>
         </div>
         {% endif %}
         {% for k in range(n) %}
@@ -42,9 +42,9 @@
     </div>
     <div class="half-2">
         {% if n1!=0 %}
-        <h1 style="text-align:center;color:lightblue;">Range Partitions</h1>
+        <h1 style="text-align:center;color:#0000CD;">Hash Partitions</h1>
         <div class="part">
-            <a href="/partition"><input type="submit" value="Range Partitions"></a>
+            <a href="/partition"><input type="submit" value="Hash Partitions"></a>
         </div>
         {% endif %}
         {% for k in range(n1) %}
